@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ranting App</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class=" p-6 flex items-center justify-end gap-x-8">
+        <a class="text-xl " href="index.html">Add New</a>
+        <a class="text-xl" href="collaborate.html">View Together</a>
+        <a class="text-xl active" href="allRants.html">View All</a>
+    </nav>
+    <div class="container  flex flex-col items-start justify-center p-8 gap-y-4 w-full lg:w-3/5 mx-auto">
+        <h1 class="text-5xl font-bold">See All <span class="bg-grad">Dukh! Dard! Peedha!</span></h1>
+        <h2 class="text-3xl font-normal subHeading my-2">हर कोई Dukhi hai||</h2>
+
+        <div class="w-full my-12 flex flex-wrap items-start justify-start gap-4" id="allRantList">
+        </div>
+        <div class="messageSection text-lg"></div>
+
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+    <script src="index.js"></script>
+    <script>
+        window.addEventListener("load", async () => {
+            await fetchAllData()
+        }) 
+    </script>
+
+</body>
+
+</html>

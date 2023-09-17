@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ranting App</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class=" p-6 flex items-center justify-end gap-x-8">
+        <a class="text-xl " href="index.html">Add New</a>
+        <a class="text-xl active" href="collaborate.html">View Together</a>
+        <a class="text-xl" href="allRants.html">View All</a>
+    </nav>
+    <div class="container flex flex-col items-start justify-center p-8 pb-0 gap-y-4 w-full lg:w-3/5 mx-auto">
+        <h1 class="text-5xl font-bold">Welcome to <span class="bg-grad">Dukh! Dard! Peedha!</span></h1>
+        <h2 class="text-3xl font-normal subHeading my-2">आओ Dukh बाँटें |</h2>
+
+        <div class="w-full my-12">
+            <div
+                class="rounded-lg overflow-hidden shadow-lg card w-full lg:w-3/4 min-h-60 flex flex-col items-start justify-around mx-auto h-80 lg:h-auto ">
+
+                <div class="px-6 py-4">
+                    <div class="font-bold text-4xl lg:text-2xl mb-2 randomMessage" id="randomMessage">
+                    </div>
+                    <div class="font-bold text-xl lg:text-lg mb-2 randomMessage" id="randomUser">
+                    </div>
+
+                </div>
+                <div class="px-6 pt-4 pb-2 flex">
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-6 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 reactionButton flex items-center justify-between gap-x-2 "
+                        id="likeCount">
+                        <picture>
+                            <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d_1f3fb/512.webp"
+                                type="image/webp">
+                            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d_1f3fb/512.gif" alt="👍"
+                                width="32" height="32">
+                        </picture>
+
+                    </span>
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-6 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 reactionButton flex items-center justify-between gap-x-2 "
+                        id="laughingCount">
+                        <picture>
+                            <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f606/512.webp"
+                                type="image/webp">
+                            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f606/512.gif" alt="😆" width="32"
+                                height="32">
+                        </picture>
+
+                    </span>
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-6 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 reactionButton flex items-center justify-between gap-x-2 "
+                        id="cryCount">
+                        <picture>
+                            <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f622/512.webp"
+                                type="image/webp">
+                            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f622/512.gif" alt="😢" width="32"
+                                height="32">
+                        </picture>
+                    </span>
+                    <span
+                        class="inline-block bg-gray-200 rounded-full px-6 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2 reactionButton flex items-center justify-between gap-x-2 "
+                        id="clapsCount">
+                        <picture>
+                            <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44f_1f3fb/512.webp"
+                                type="image/webp">
+                            <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f44f_1f3fb/512.gif" alt="👏"
+                                width="32" height="32">
+                        </picture>
+
+                    </span>
+
+                </div>
+            </div>
+        </div>
+        <button
+            class="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg"
+            onclick="handleNewMessage()">
+            Get new
+        </button>
+
+
+        <div class="messageSection text-lg"></div>
+
+    </div>
+    <div id="allReactionsLog" class="flex flex-col p-4"></div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.min.js"></script>
+    <script src="index.js"></script>
+    <script>
+        window.addEventListener("load", async () => {
+            // await fetchSingle()
+            handleNewMessage()
+
+        })
+
+
+        let likeCount = document.getElementById("likeCount")
+        let laughingCount = document.getElementById("laughingCount")
+        let clapsCount = document.getElementById("clapsCount")
+        let tempData;
+        socket.on("newMessage", (data) => {
+
+            tempData = structuredClone(data)
+            console.log(data)
+            document.getElementById("randomMessage").innerText = data?.text || "Unknown message"
+            document.getElementById("randomUser").innerText = data?.user || "Unknown user"
+        })
+        // emit a particular reaction
+        console.log("works after new Message")
+        likeCount.addEventListener("click", () => {
+            throwReaction("like")
+        })
+        laughingCount.addEventListener("click", () => {
+            throwReaction("laughing")
+        })
+        cryCount.addEventListener("click", () => {
+            throwReaction("cry")
+        })
+        clapsCount.addEventListener("click", () => {
+            throwReaction("claps")
+        })
+
+
+        //get particular reactions
+        socket.on("reactionResponse", (data) => {
+            let tempElem = document.createElement("div");
+            tempElem.classList.add("reactionBox")
+
+            let tempEmojiSrc;
+            let tempEmojiHolder = document.createElement("picture")
+            let tempSource = document.createElement("source")
+            let tempImg = document.createElement("img")
+
+            let tempName = document.createElement("span")
+            //create the reaction box
+
+            switch (data?.type) {
+                case "like":
+                    tempEmojiSrc = "https://fonts.gstatic.com/s/e/notoemoji/latest/1f44d_1f3fb/512"
+                    break;
+                case "laughing":
+                    tempEmojiSrc = "https://fonts.gstatic.com/s/e/notoemoji/latest/1f606/512"
+                    break;
+                case "claps":
+                    tempEmojiSrc = "https://fonts.gstatic.com/s/e/notoemoji/latest/1f44f_1f3fb/512"
+                    break;
+                case "cry":
+                    tempEmojiSrc = "https://fonts.gstatic.com/s/e/notoemoji/latest/1f622/512"
+                    break;
+                default:
+                    tempEmojiSrc = "#"
+                    break;
+            }
+
+
+            tempSource.setAttribute("srcset", tempEmojiSrc + ".webp")
+            tempSource.setAttribute("type", "image/webp")
+            tempImg.setAttribute("src", tempEmojiSrc + ".gif")
+            tempImg.setAttribute("alt", "HEY")
+            tempImg.setAttribute("width", "32")
+            tempImg.setAttribute("height", "32")
+
+
+            //append the source to <picture>
+            tempEmojiHolder.append(tempSource)
+            //append the img to <picture>
+            tempEmojiHolder.appendChild(tempImg)
+
+            // set the name
+            tempName.textContent = data?.name
+            console.log(tempName)
+            // append picture to reactionbox
+            tempElem.appendChild(tempEmojiHolder)
+            // append span to reactionbox
+            tempElem.appendChild(tempName)
+
+            let [x] = generateRandomPoints()
+            //generate random points to place tempelem in
+            tempElem.style.left = `min(90vw,${parseInt(x)}px)`;
+
+            document.body.appendChild(tempElem);
+            setTimeout(() => {
+                document.body.removeChild(tempElem)
+            }, 4500);
+
+
+        })
+
+
+        socket.on("newMessage", (data) => console.log(data))
+        socket.emit("sendMessage", (data) => console.log(data))
+    </script>
+
+</body>
+
+</html>
